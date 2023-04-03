@@ -6,3 +6,7 @@ RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 RUN export PATH=/depot_tools:$PATH && mkdir ~/chromium && cd ~/chromium && update_depot_tools && fetch --nohooks android
 RUN apt install xz-utils bzip2 -y
 RUN export PATH=/depot_tools:$PATH && cd ~/chromium && gclient sync
+RUN apt install vim pkg-config -y
+#RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src && gn args out/Default
+RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src && gn gen out/Default --args='target_os="android" target_cpu="arm" is_debug=false' 
+RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src/ && ls -a

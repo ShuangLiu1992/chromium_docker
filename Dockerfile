@@ -10,6 +10,6 @@ RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src/ build/install-build-dep
 RUN export PATH=/depot_tools:$PATH && cd ~/chromium/ && gclient runhooks
 RUN apt install vim pkg-config -y
 #RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src && gn args out/Default
-RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src && gn gen out/Default --args='target_os="android" target_cpu="arm" is_debug=false' 
+RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src && gn gen out/Default --args="is_debug=false target_os=\"android\" target_cpu=\"arm64\""
 RUN export PATH=/depot_tools:$PATH && cd ~/chromium/src && autoninja -C out/Default chrome_public_apk
 # out/Default/bin/chrome_public_apk install

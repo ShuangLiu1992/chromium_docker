@@ -1,0 +1,135 @@
+diff --git a/media/capture/video/android/java/src/org/chromium/media/VideoCaptureCamera2.java b/media/capture/video/android/java/src/org/chromium/media/VideoCaptureCamera2.java
+index d82008380692b..bbd81f6dc0b37 100644
+--- a/media/capture/video/android/java/src/org/chromium/media/VideoCaptureCamera2.java
++++ b/media/capture/video/android/java/src/org/chromium/media/VideoCaptureCamera2.java
+@@ -1107,12 +1107,14 @@ public class VideoCaptureCamera2 extends VideoCapture {
+             final int[] stabilizationModes = cameraCharacteristics.get(
+                     CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES);
+             for (int mode : stabilizationModes) {
+-                if (mode == CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON) {
++                if (mode == CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF) {
+                     mPreviewRequestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
+-                            CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON);
++                            CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
+                     break;
+                 }
+             }
++            mPreviewRequestBuilder.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
++                    CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_OFF);
+ 
+             configureCommonCaptureSettings(mPreviewRequestBuilder);
+ 
+diff --git a/services/device/generic_sensor/platform_sensor_util.cc b/services/device/generic_sensor/platform_sensor_util.cc
+index dbc9c43ca9b9c..22962f6479fee 100644
+--- a/services/device/generic_sensor/platform_sensor_util.cc
++++ b/services/device/generic_sensor/platform_sensor_util.cc
+@@ -52,15 +52,15 @@ double RoundToMultiple(double value, double multiple) {
+ }
+ 
+ void RoundAccelerometerReading(SensorReadingXYZ* reading) {
+-  reading->x = RoundToMultiple(reading->x, kAccelerometerRoundingMultiple);
+-  reading->y = RoundToMultiple(reading->y, kAccelerometerRoundingMultiple);
+-  reading->z = RoundToMultiple(reading->z, kAccelerometerRoundingMultiple);
++  // reading->x = RoundToMultiple(reading->x, kAccelerometerRoundingMultiple);
++  // reading->y = RoundToMultiple(reading->y, kAccelerometerRoundingMultiple);
++  // reading->z = RoundToMultiple(reading->z, kAccelerometerRoundingMultiple);
+ }
+ 
+ void RoundGyroscopeReading(SensorReadingXYZ* reading) {
+-  reading->x = RoundToMultiple(reading->x, kGyroscopeRoundingMultiple);
+-  reading->y = RoundToMultiple(reading->y, kGyroscopeRoundingMultiple);
+-  reading->z = RoundToMultiple(reading->z, kGyroscopeRoundingMultiple);
++  // reading->x = RoundToMultiple(reading->x, kGyroscopeRoundingMultiple);
++  // reading->y = RoundToMultiple(reading->y, kGyroscopeRoundingMultiple);
++  // reading->z = RoundToMultiple(reading->z, kGyroscopeRoundingMultiple);
+ }
+ 
+ void RoundIlluminanceReading(SensorReadingSingle* reading) {
+@@ -68,48 +68,48 @@ void RoundIlluminanceReading(SensorReadingSingle* reading) {
+ }
+ 
+ void RoundOrientationQuaternionReading(SensorReadingQuat* reading) {
+-  double original_angle_div_2 = std::acos(reading->w);
+-  double rounded_angle_div_2 =
+-      RoundToMultiple(original_angle_div_2 * 2.0,
+-                      kOrientationQuaternionRoundingMultiple) /
+-      2.0;
+-  if (rounded_angle_div_2 == 0.0) {
+-    // If there's no rotation after rounding, return the identity quaternion.
+-    reading->w = 1;
+-    reading->x = reading->y = reading->z = 0;
+-    return;
+-  }
+-  // After this, original_angle_div_2 will definitely not be too close to 0.
+-  double sin_angle_div_2 = std::sin(original_angle_div_2);
+-  double axis_x = reading->x / sin_angle_div_2;
+-  double axis_y = reading->y / sin_angle_div_2;
+-  double axis_z = reading->z / sin_angle_div_2;
+-
+-  // Convert from (x,y,z) vector to azimuth/elevation.
+-  double xy_dist = std::sqrt(square(axis_x) + square(axis_y));
+-
+-  double azim = std::atan2(axis_x, axis_y);
+-  double elev = std::atan2(axis_z, xy_dist);
+-  azim = RoundToMultiple(azim, kOrientationQuaternionRoundingMultiple);
+-  elev = RoundToMultiple(elev, kOrientationQuaternionRoundingMultiple);
+-
+-  // Convert back from azimuth/elevation to the (x,y,z) unit vector.
+-  axis_x = std::sin(azim) * std::cos(elev);
+-  axis_y = std::cos(azim) * std::cos(elev);
+-  axis_z = std::sin(elev);
+-
+-  // Reconstruct Quaternion from (x,y,z,rotation).
+-  sin_angle_div_2 = std::sin(rounded_angle_div_2);
+-  reading->x = axis_x * sin_angle_div_2;
+-  reading->y = axis_y * sin_angle_div_2;
+-  reading->z = axis_z * sin_angle_div_2;
+-  reading->w = std::cos(rounded_angle_div_2);
++  // double original_angle_div_2 = std::acos(reading->w);
++  // double rounded_angle_div_2 =
++  //     RoundToMultiple(original_angle_div_2 * 2.0,
++  //                     kOrientationQuaternionRoundingMultiple) /
++  //     2.0;
++  // if (rounded_angle_div_2 == 0.0) {
++  //   // If there's no rotation after rounding, return the identity quaternion.
++  //   reading->w = 1;
++  //   reading->x = reading->y = reading->z = 0;
++  //   return;
++  // }
++  // // After this, original_angle_div_2 will definitely not be too close to 0.
++  // double sin_angle_div_2 = std::sin(original_angle_div_2);
++  // double axis_x = reading->x / sin_angle_div_2;
++  // double axis_y = reading->y / sin_angle_div_2;
++  // double axis_z = reading->z / sin_angle_div_2;
++
++  // // Convert from (x,y,z) vector to azimuth/elevation.
++  // double xy_dist = std::sqrt(square(axis_x) + square(axis_y));
++
++  // double azim = std::atan2(axis_x, axis_y);
++  // double elev = std::atan2(axis_z, xy_dist);
++  // azim = RoundToMultiple(azim, kOrientationQuaternionRoundingMultiple);
++  // elev = RoundToMultiple(elev, kOrientationQuaternionRoundingMultiple);
++
++  // // Convert back from azimuth/elevation to the (x,y,z) unit vector.
++  // axis_x = std::sin(azim) * std::cos(elev);
++  // axis_y = std::cos(azim) * std::cos(elev);
++  // axis_z = std::sin(elev);
++
++  // // Reconstruct Quaternion from (x,y,z,rotation).
++  // sin_angle_div_2 = std::sin(rounded_angle_div_2);
++  // reading->x = axis_x * sin_angle_div_2;
++  // reading->y = axis_y * sin_angle_div_2;
++  // reading->z = axis_z * sin_angle_div_2;
++  // reading->w = std::cos(rounded_angle_div_2);
+ }
+ 
+ void RoundOrientationEulerReading(SensorReadingXYZ* reading) {
+-  reading->x = RoundToMultiple(reading->x, kOrientationEulerRoundingMultiple);
+-  reading->y = RoundToMultiple(reading->y, kOrientationEulerRoundingMultiple);
+-  reading->z = RoundToMultiple(reading->z, kOrientationEulerRoundingMultiple);
++  // reading->x = RoundToMultiple(reading->x, kOrientationEulerRoundingMultiple);
++  // reading->y = RoundToMultiple(reading->y, kOrientationEulerRoundingMultiple);
++  // reading->z = RoundToMultiple(reading->z, kOrientationEulerRoundingMultiple);
+ }
+ 
+ void RoundSensorReading(SensorReading* reading, mojom::SensorType sensor_type) {
